@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <title>My Very Exciting Guestbook</title>
+      <style>
+        form {
+          margin: auto;
+        }
+        div {
+          text-align: center;
+          margin-bottom: 20px;
+        }
+        label {
+          display: inline-block;
+          text-align: center;
+          padding-right: 20px;
+          font: Arial, Helvetica, sans-serif;
+        }
+        button, input, select {
+          text-align: left;
+        }
+      </style>
+    </head>
+    <body>
+      <form method="post" action="{{ url_for('submit.submit') }}">
+        <div>
+          <h1><label for="visitor_name">Welcome, visitor!<br>Please enter your name:</label></h1>
+          <input name="visitor_name">
+        </div>
+        <div>
+          <button>Submit</button>
+        </div>
+      </form>
+      <form method="post" action="{{ url_for('visitors.visitors') }}">
+        <div>
+          <label>Or see previous visitors</label>
+        </div>
+        <div>
+          <button>Go to List</button>
+        </div>
+      </form>
+      <div>This page has been viewed {{ count }} times</div>
+    </body>
+  </html>
+

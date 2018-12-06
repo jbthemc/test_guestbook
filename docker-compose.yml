@@ -1,0 +1,24 @@
+version: '3'
+services:
+  guestbook:
+    build: .
+    volumes:
+      - ./:/code
+    ports:
+      - "443:5000"
+    environment:
+      REDIS_HOST: redis
+      MYSQL_DATABASE_USER: root
+      MYSQL_DATABASE_PASSWORD: password1
+      MYSQL_DATABASE_DB: website
+      MYSQL_DATABASE_HOST: mysql
+    restart: on-failure:5 
+  redis:
+    image: "redis:alpine"
+    restart: on-failure:5 
+  mysql:
+    image: mysql:5.7
+    environment:
+      MYSQL_DATABASE: website
+      MYSQL_ROOT_PASSWORD: password1
+    restart: on-failure:5 
