@@ -1,24 +1,36 @@
 version: '3'
+
+volumes:
+  redis_vol:
+  mysql_vol:
+  
 services:
   guestbook:
-    build: .
-    volumes:
-      - ./:/code
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+      args:
+        GIT_REPO: ${GIT_REPO}
+        GIT_BRANCH: ${GIT_BRANCH}
+        PRIVATE_KEY: ${PRIVATE_KEY}
     ports:
-      - "443:5000"
+      - "8080:5000"
     environment:
-      REDIS_HOST: redis
-      MYSQL_DATABASE_USER: root
-      MYSQL_DATABASE_PASSWORD: password1
-      MYSQL_DATABASE_DB: website
-      MYSQL_DATABASE_HOST: mysql
-    restart: on-failure:5 
+      REDIS_HOST: ${REDIS_HOST}
+      MYSQL_DATABASE_HOST: ${DB_HOST}
+      MYSQL_DATABASE_USER: ${DB_USER}
+      MYSQL_DATABASE_PASSWORD: ${DB_PASSWORD}
+      MYSQL_DATABASE_DB: ${DB_NAME}
+    restart: always
   redis:
     image: "redis:alpine"
-    restart: on-failure:5 
+    volumes:
+      - redis_vol:/data
   mysql:
     image: mysql:5.7
     environment:
       MYSQL_DATABASE: website
       MYSQL_ROOT_PASSWORD: password1
-    restart: on-failure:5 
+    volumes:
+      - mysql_vol:/var/lib/mysql
+
