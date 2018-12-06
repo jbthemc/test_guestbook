@@ -3,22 +3,26 @@ version: '3'
 volumes:
   redis_vol:
   mysql_vol:
-  
+
 services:
   guestbook:
-    build:
+    build: .
     volumes:
       - ./:/code
       context: .
       dockerfile: ./Dockerfile
+      args:
+        GIT_REPO: git@github.com:jbthemc/test_guestbook.git
+        GIT_BRANCH: master
+        PRIVATE_KEY: $(cat ~/.ssh/id_rsa)
     ports:
       - "8080:5000"
     environment:
       REDIS_HOST: redis
-      MYSQL_DATABASE_HOST: root
-      MYSQL_DATABASE_USER: password1
-      MYSQL_DATABASE_PASSWORD: website
-      MYSQL_DATABASE_DB: mysql
+      MYSQL_DATABASE_HOST: mysql
+      MYSQL_DATABASE_USER: root
+      MYSQL_DATABASE_PASSWORD: password1
+      MYSQL_DATABASE_DB: website
     restart: always
   redis:
     image: "redis:alpine"
