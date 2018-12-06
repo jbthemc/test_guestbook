@@ -7,20 +7,18 @@ volumes:
 services:
   guestbook:
     build:
+    volumes:
+      - ./:/code
       context: .
       dockerfile: ./Dockerfile
-      args:
-        GIT_REPO: ${GIT_REPO}
-        GIT_BRANCH: ${GIT_BRANCH}
-        PRIVATE_KEY: ${PRIVATE_KEY}
     ports:
       - "8080:5000"
     environment:
-      REDIS_HOST: ${REDIS_HOST}
-      MYSQL_DATABASE_HOST: ${DB_HOST}
-      MYSQL_DATABASE_USER: ${DB_USER}
-      MYSQL_DATABASE_PASSWORD: ${DB_PASSWORD}
-      MYSQL_DATABASE_DB: ${DB_NAME}
+      REDIS_HOST: redis
+      MYSQL_DATABASE_HOST: root
+      MYSQL_DATABASE_USER: password1
+      MYSQL_DATABASE_PASSWORD: website
+      MYSQL_DATABASE_DB: mysql
     restart: always
   redis:
     image: "redis:alpine"
