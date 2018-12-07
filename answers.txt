@@ -1,0 +1,51 @@
+# AWS Setup
+
+* Persistent DBs
+ - Redis (AWS Elasticache/Redis Cluster)
+ - MySQL (AWS RDS/MySQL or Aurora Cluster)
+
+* EC2 Instance
+  - Start from base ami & make sure you have latest Docker installed
+  - Enable docker to start at boot
+  - Generate private/public SSH keypair (you'll need it for Git)
+  - Add the public SSH key to Git server you use to host the app
+  - Add to crontab to run the docker-compose up -d at reboot
+	= Make sure you use updated Dockerfile & docker-compose.yml
+	= The Dockerfile should pull latest changes from Git when building
+	= cron should include export PRIVATE_KEY=$(cat ~/.ssh/id_rsa)
+
+* Setup EC2 AutoScaling
+  - Create AMI from previously built EC2 instance
+  - Create LaunchConfig with exported AMI
+  - Create TargetGroup
+  - Create internet-facing Application LoadBalancer (ALB)
+	= select previously created TargetGroup
+  - Create AutoScaling Group from LaunchConfig (with CloudWatch Metrics for scaling)
+	= use created TargetGroup
+	= use VPC network
+	= Receive traffic from ALB
+	= Select created TargetGroup
+	= Enable Scaling based on requirements
+  - If needed in the future, you can create new LaunchConfig with new AMI
+
+* Stability
+  - No need for backups. Infrastructure uses AWS provided Redis & MySQL. 
+	They can be configured in cluster mode with recurring backups
+  - Every instance in the AutoScaling group has docker container running with restart: always
+	= If for some reason the container fails to start more times, the AutoScaling group can be
+	  configured to use ELB healthchecks and if instance won't become healthy in 300 seconds it will 
+	  terminate it and create another(which will result in another git pull)
+  - Use of LoadBalancers with AutoScaling ensures application safety & stability under load
+
+* Scalability
+  - Achieved by use of AutoScaling Groups
+  - Scripts can be created to ensure application updates either using bash(to trigger a container rebuild)
+    or some more advanced tools like Terraform or even using git-hooks
+
+* Security
+  - Use best practices for AWS SecurityGroups & Subnets
+  - Make sure RDS/Redis are in a private Subnet and/or restrict access using SecurityGroups
+  - Recommended to use SSH certificates instead of plain passwords to access EC2 instances
+  - SSL can be used either with some extra configuration using LetsEncrypt directly on the EC2 instances
+    or using AWS Certificate Manager(ACM) to generate certificate and apply it on the ALB
+  - Another good practice is to use SecurityGroups in port filtering instead of plan source IP filtering
