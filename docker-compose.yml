@@ -12,6 +12,7 @@ services:
       args:
         GIT_REPO: git@github.com:jbthemc/test_guestbook.git
         GIT_BRANCH: master
+        PRIVATE_KEY: ${PRIVATE_KEY}
     ports:
       - "8080:5000"
     environment:
