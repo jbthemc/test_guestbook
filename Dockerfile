@@ -10,9 +10,9 @@ ENV GIT_BRANCH=${GIT_BRANCH}
 ADD . /code
 WORKDIR /code
 
-RUN eval $(ssh-agent -s)
-RUN "echo '' | ssh-add <(echo \"${PRIVATE_KEY}\")"
-RUN git clone --single-branch -b ${GIT_BRANCH} ${GIT_REPO}
+RUN mkdir ~/.ssh/ && echo "${PRIVATE_KEY}" > ~/.ssh/id_rsa && chmod 600 ~/.ssh/id_rsa
+RUN echo 'Host *\n  StrictHostKeyChecking no' > ~/.ssh/config
+RUN eval $(ssh-agent -s) && ssh-add ~/.ssh/id_rsa && git checkout && git clone --single-branch -b ${GIT_BRANCH} ${GIT_REPO}
 RUN pip install -r requirements.txt
 
 CMD ["python", "app.py"]
